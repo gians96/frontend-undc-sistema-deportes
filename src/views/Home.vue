@@ -7,15 +7,15 @@
         <div class="flex flex-wrap gap-3 justify-center">
           <button
             v-for="deporte in deportes"
-            :key="deporte.id"
-            @click="seleccionarDeporte(deporte.id)"
+            :key="deporte.valor"
+            @click="seleccionarDeporte(deporte.valor)"
             class="px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
-            :class="deporteSeleccionado === deporte.id
+            :class="deporteSeleccionado === deporte.valor
               ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30'
               : 'bg-oscuro-700 text-oscuro-300 hover:bg-oscuro-600 hover:text-white'"
           >
             <i :class="deporte.icono"></i>
-            <span>{{ deporte.nombre }}</span>
+            <span>{{ deporte.etiqueta }}</span>
           </button>
         </div>
       </div>
@@ -81,13 +81,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import TablaPosiciones from '@/components/Home/TablaPosiciones.vue';
 import SkeletonTabla from '@/components/Home/SkeletonTabla.vue';
 import BotonHexagonal from '@/components/common/botton/BotonHexagonal.vue';
-import { obtenerPosiciones, obtenerDeportesDisponibles } from '@/apis/posiciones.api';
+import { obtenerPosiciones } from '@/apis/posiciones.api';
+import { useOpcionesDeporte } from '@/stores/deporte.js';
 
-const deportes = ref([]);
+const deporteStore = useOpcionesDeporte();
+
+const deportes = computed(() => deporteStore.obtenerDeportes);
 const deporteSeleccionado = ref(1);
 const datos = ref(null);
 const cargando = ref(false);
@@ -116,7 +119,6 @@ const seleccionarDeporte = (deporteId) => {
 };
 
 onMounted(() => {
-  deportes.value = obtenerDeportesDisponibles();
   cargarPosiciones(deporteSeleccionado.value);
 });
 </script>
