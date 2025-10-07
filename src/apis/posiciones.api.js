@@ -5,24 +5,31 @@ export const obtenerPosiciones = async (deporteId = 1) => {
 
   // Datos simulados basados en simulacion-api.json
   const datosSimulados = {
-    1: { // Fútbol
+    1: { // Fútsal
       id_deporte: 1,
-      nombre_deporte: "Fútbol",
+      nombre_deporte: "Fútsal",
       torneo: "Torneo Interuniversitario 2025",
       fecha_actualizacion: new Date().toISOString(),
       posiciones: []
     },
-    2: { // Básquet
-      id_deporte: 2,
-      nombre_deporte: "Básquet",
-      torneo: "Copa Universitaria de Básquet 2025",
+    3: { // Vóley
+      id_deporte: 3,
+      nombre_deporte: "Vóley",
+      torneo: "Copa Universitaria de Vóley 2025",
       fecha_actualizacion: new Date().toISOString(),
       posiciones: []
     },
-    3: { // Volleyball
-      id_deporte: 3,
-      nombre_deporte: "Volleyball",
-      torneo: "Liga Universitaria de Volleyball 2025",
+    4: { // Ajedrez
+      id_deporte: 4,
+      nombre_deporte: "Ajedrez",
+      torneo: "Torneo de Ajedrez Universitario 2025",
+      fecha_actualizacion: new Date().toISOString(),
+      posiciones: []
+    },
+    5: { // Gincana
+      id_deporte: 5,
+      nombre_deporte: "Gincana",
+      torneo: "Gincana Universitaria 2025",
       fecha_actualizacion: new Date().toISOString(),
       posiciones: []
     }
@@ -42,11 +49,3 @@ export const obtenerPosiciones = async (deporteId = 1) => {
   return datosSimulados[deporteId];
 };
 
-// Función para obtener lista de deportes disponibles
-export const obtenerDeportesDisponibles = () => {
-  return [
-    { id: 1, nombre: "Fútbol", icono: "fa-solid fa-futbol" },
-    { id: 2, nombre: "Básquet", icono: "fa-solid fa-basketball" },
-    { id: 3, nombre: "Volleyball", icono: "fa-solid fa-volleyball" }
-  ];
-};
