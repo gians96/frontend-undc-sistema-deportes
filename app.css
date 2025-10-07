@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@theme {
+  --color-oscuro-50:  #e5e7e9;
+  --color-oscuro-100: #cfd3d6;
+  --color-oscuro-200: #a3aab0;
+  --color-oscuro-300: #77808a;
+  --color-oscuro-400: #4b5663;
+  --color-oscuro-500: #2c3745;
+  --color-oscuro-600: #1d262f;
+  --color-oscuro-700: #151d24;
+  --color-oscuro-800: #0f161b;
+  --color-oscuro-900: #080c0f;
+  --color-oscuro-950: #040608;
+}
+
+* {
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
