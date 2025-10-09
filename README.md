@@ -206,6 +206,47 @@ La aplicación se comunica con el backend a través de:
 - **Interceptores**: Manejo automático de errores y reautenticación
 - **CORS**: Configurado para desarrollo y producción
 
+## 📝 Comandos Docker
+
+### Variables de Entorno en Runtime
+
+Este proyecto soporta configuración dinámica mediante variables de entorno:
+
+```bash
+# 1. Construir imagen
+docker build -t undc-deportes-frontend .
+
+# 2. Ejecutar contenedor con variables de entorno
+docker stop undc-deportes-client; docker rm undc-deportes-client
+
+docker run -d --name undc-deportes-client -p 3305:80 --restart unless-stopped undc-deportes-frontend
+
+# 3. Ver logs
+docker logs -f undc-deportes-client
+
+# 4. Detener
+docker stop undc-deportes-client
+
+# 5. Eliminar
+docker rm undc-deportes-client
+```
+
+### Variables de Entorno Disponibles
+
+- `API_URL` - URL del backend API (default: `http://localhost:3100`)
+- `APP_ENV` - Entorno de ejecución (default: `production`)
+
+### Ejemplo para Dokploy
+
+En Dokploy, configura estas variables de entorno en la UI:
+
+```
+API_URL=https://api.tudominio.com
+APP_ENV=production
+```
+
+El contenedor usará estas variables automáticamente al iniciar.
+
 ---
 
 **Universidad Nacional del Callao - Sistema Deportivo**

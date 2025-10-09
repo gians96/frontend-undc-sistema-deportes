@@ -3,7 +3,7 @@ import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Aplicar withCredentials globalmente a toda la instancia
+  baseURL: import.meta.env.VITE_API_BASE_URL || process.env.VITE_API_BASE_URL, // Aplicar withCredentials globalmente a toda la instancia
   withCredentials: true,
 });
 

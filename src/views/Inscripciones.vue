@@ -468,7 +468,7 @@ const cerrarModalRegistro = () => {
   mostrarModalRegistro.value = false;
   // Redirigir al home si no tiene acceso
   if (!accesoAutorizado.value) {
-    router.push('/403');
+    router.push('/');
   }
 };
 

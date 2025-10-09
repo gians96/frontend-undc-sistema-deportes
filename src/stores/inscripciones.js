@@ -25,7 +25,7 @@ export const useOpcionesPago = defineStore("pago", {
 export const useAutorizarIngreso = defineStore("inicio", {
   state: () => ({
     // UUID autorizado para acceder a las inscripciones
-    uuidAutorizado: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    uuidAutorizado: import.meta.env.VITE_UUID_AUTHORIZED,
     // Estado de autorización del usuario actual
     usuarioAutorizado: false,
     // UUID ingresado por el usuario

@@ -5,7 +5,8 @@
 
     <!-- Modal -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="relative transform overflow-hidden rounded-xl bg-oscuro-900 shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-oscuro-800">
+      <div
+        class="relative transform overflow-hidden rounded-xl bg-oscuro-900 shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-oscuro-800">
         <!-- Header -->
         <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-oscuro-600">
           <div class="flex items-center justify-between">
@@ -17,10 +18,8 @@
                 Comprobante de Pago
               </h3>
             </div>
-            <button
-              @click="$emit('cerrar')"
-              class="rounded-lg text-white/80 hover:text-white hover:bg-white/10 focus:outline-none p-2 transition-all"
-            >
+            <button @click="$emit('cerrar')"
+              class="rounded-lg text-white/80 hover:text-white hover:bg-white/10 focus:outline-none p-2 transition-all">
               <i class="fas fa-times text-xl"></i>
             </button>
           </div>
@@ -36,12 +35,8 @@
                 Comprobante
               </h4>
               <div class="border border-oscuro-600 rounded-lg overflow-hidden bg-oscuro-700">
-                <img
-                  :src="imagenUrl"
-                  :alt="`Voucher ${voucher.numero_voucher}`"
-                  class="w-full h-auto max-h-96 object-contain bg-oscuro-900"
-                  @error="errorImagen = true"
-                />
+                <img :src="imagenUrl" :alt="`Voucher ${voucher.numero_voucher}`"
+                  class="w-full h-auto max-h-96 object-contain bg-oscuro-900" @error="errorImagen = true" />
                 <div v-if="errorImagen" class="p-8 text-center text-oscuro-300">
                   <i class="fas fa-image text-4xl mb-2"></i>
                   <p>No se pudo cargar la imagen</p>
@@ -73,10 +68,8 @@
                     </div>
                     <div>
                       <p class="text-sm text-oscuro-300">Estado</p>
-                      <span
-                        :class="getEstadoClasses(voucher.estado)"
-                        class="px-2 py-1 text-xs font-semibold rounded-full"
-                      >
+                      <span :class="getEstadoClasses(voucher.estado)"
+                        class="px-2 py-1 text-xs font-semibold rounded-full">
                         {{ getEstadoTexto(voucher.estado) }}
                       </span>
                     </div>
@@ -108,30 +101,22 @@
         <!-- Footer con botones de acción -->
         <div class="bg-oscuro-800 px-6 py-4 border-t border-oscuro-700">
           <div class="flex justify-end space-x-3">
-            <button
-              @click="$emit('cerrar')"
-              class="px-6 py-3 text-sm font-semibold text-oscuro-200 bg-oscuro-600 border border-oscuro-500 rounded-lg hover:bg-oscuro-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
-            >
+            <button @click="$emit('cerrar')"
+              class="px-6 py-3 text-sm font-semibold text-oscuro-200 bg-oscuro-600 border border-oscuro-500 rounded-lg hover:bg-oscuro-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
               Cerrar
             </button>
 
-            <button
-              v-if="voucher.estado !== 'rechazado'"
-              @click="$emit('validar', voucher.id_voucher, 'rechazado')"
+            <button v-if="voucher.estado !== 'rechazado'" @click="$emit('validar', voucher.id_voucher, 'rechazado')"
               :disabled="procesando"
-              class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 border border-transparent rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 shadow-lg"
-            >
+              class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 border border-transparent rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 shadow-lg">
               <i v-if="procesando === voucher.id_voucher" class="fas fa-spinner fa-spin"></i>
               <i v-else class="fas fa-times"></i>
               Rechazar
             </button>
 
-            <button
-              v-if="voucher.estado !== 'validado'"
-              @click="$emit('validar', voucher.id_voucher, 'validado')"
+            <button v-if="voucher.estado !== 'validado'" @click="$emit('validar', voucher.id_voucher, 'validado')"
               :disabled="procesando"
-              class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 border border-transparent rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 shadow-lg"
-            >
+              class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 border border-transparent rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 shadow-lg">
               <i v-if="procesando === voucher.id_voucher" class="fas fa-spinner fa-spin"></i>
               <i v-else class="fas fa-check"></i>
               Validar
@@ -167,7 +152,7 @@ const errorImagen = ref(false)
 
 const imagenUrl = computed(() => {
   if (!props.voucher.nombre_imagen) return ''
-  const baseURL = import.meta.env.VITE_API_BASE_URL
+  const baseURL = import.meta.env.VITE_API_BASE_URL || process.env.VITE_API_BASE_URL
   return `${baseURL}/uploads/${props.voucher.nombre_imagen}`
 })
 
@@ -205,6 +190,7 @@ const getEstadoTexto = (estado) => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
