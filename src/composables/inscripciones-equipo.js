@@ -7,7 +7,31 @@ export function useInscripcionesEquipo(modelValue, emit) {
   const formularioLocal = ref({ ...modelValue.value })
 
   const opcionesCiclos = computed(() => opcionesStore.obtenerCiclos)
-  const opcionesDeportes = computed(() => opcionesStore.obtenerDeportes)
+  
+  const opcionesDeportes = computed(() => {
+    const todosLosDeportes = opcionesStore.obtenerDeportes;
+    if (formularioLocal.value.tipoPago === 'basket') {
+      return todosLosDeportes.filter(d => d.tipo === 'basket');
+    } else {
+      return todosLosDeportes.filter(d => !d.tipo);
+    }
+  });
+
+  watch(() => formularioLocal.value.tipoPago, (nuevoTipo) => {
+    const todosLosDeportes = opcionesStore.obtenerDeportes;
+    if (nuevoTipo === 'basket') {
+      const deporteBasket = todosLosDeportes.find(d => d.tipo === 'basket');
+      if (deporteBasket) {
+        formularioLocal.value.deporte = deporteBasket.valor;
+      }
+    } else {
+      // Si el deporte seleccionado era basket, limpiarlo
+      const deporteActual = todosLosDeportes.find(d => d.valor === formularioLocal.value.deporte);
+      if (deporteActual && deporteActual.tipo === 'basket') {
+        formularioLocal.value.deporte = '';
+      }
+    }
+  });
 
   // Bandera para evitar ciclos infinitos
   let actualizandoDesdeProps = false

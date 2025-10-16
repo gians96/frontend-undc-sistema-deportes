@@ -17,6 +17,7 @@ export const useOpcionesDeporte = defineStore("opciones", {
     ],
     deportes: [
       { valor: 1, etiqueta: 'Fútsal', icono: 'fas fa-futbol' },
+      { valor: 2, etiqueta: 'Básquet', icono: 'fa-solid fa-basketball', tipo: 'basket' },
       { valor: 3, etiqueta: 'Vóley', icono: 'fa-solid fa-volleyball' },
       { valor: 4, etiqueta: 'Ajedrez', icono: 'fa-solid fa-chess' },
       { valor: 5, etiqueta: 'Gincana', icono: 'fas fa-puzzle-piece' }

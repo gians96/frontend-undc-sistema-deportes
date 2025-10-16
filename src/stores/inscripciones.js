@@ -18,6 +18,7 @@ export const useOpcionesPago = defineStore("pago", {
     pago: [
       { tipo: "Inscripción Regular", monto: "80.00", valor: "regular" },
       { tipo: "Inscripción Adicional", monto: "15.00", valor: "adicional" },
+      { tipo: "Inscripción Básquet", monto: "10.00", valor: "basket" },
     ],
   }),
 });
