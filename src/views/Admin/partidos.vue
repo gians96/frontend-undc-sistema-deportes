@@ -94,10 +94,6 @@ import SelectorDeporte from '@/components/Admin/Partidos/SelectorDeporte.vue';
 import PanelControl from '@/components/Admin/Partidos/PanelControl.vue';
 import { useAdminPartidos } from '@/composables/admin-partidos';
 
-defineOptions({
-  layout: AdminLayout
-});
-
 // Usar el composable que maneja toda la lógica
 const {
   // Estado

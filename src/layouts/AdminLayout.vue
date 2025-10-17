@@ -107,3 +107,71 @@ const handleMenuAction = (action) => {
   opacity: 0;
 }
 </style>
+
+<style>
+/* Scrollbar personalizado para todo el layout admin - estilos globales */
+.admin-layout * {
+  scrollbar-width: thin;
+  scrollbar-color: #374151 #1f2937;
+}
+
+.admin-layout *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-layout *::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+.admin-layout *::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+  border: 2px solid #1f2937;
+}
+
+.admin-layout *::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+.admin-layout *::-webkit-scrollbar-corner {
+  background: #000000;
+}
+
+/* Scrollbar del body y html */
+body:has(.admin-layout),
+html:has(.admin-layout) {
+  scrollbar-width: thin;
+  scrollbar-color: #37415165 #000000;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar,
+html:has(.admin-layout)::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-track,
+html:has(.admin-layout)::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-thumb,
+html:has(.admin-layout)::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+  border: 2px solid #1f2937;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-thumb:hover,
+html:has(.admin-layout)::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-corner,
+html:has(.admin-layout)::-webkit-scrollbar-corner {
+  background: #1f2937;
+}
+</style>
