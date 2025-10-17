@@ -16,18 +16,18 @@
       ></div>
 
       <!-- Círculos decorativos -->
-      <div class="absolute top-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-20 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div class="hidden md:block absolute top-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="hidden md:block absolute bottom-20 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
       <!-- Grid pattern -->
-      <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div class="hidden md:block absolute inset-0 bg-grid-pattern opacity-5"></div>
     </div>
 
     <!-- Contenedor principal -->
     <div class="relative z-10 w-full max-w-md">
 
       <!-- Card principal -->
-      <div class="bg-oscuro-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-oscuro-600/50 overflow-hidden">
+      <div class="bg-oscuro-800/50 backdrop-blur-xl rounded-4xl md:rounded-2xl shadow-2xl border border-oscuro-600/50 overflow-hidden">
 
         <!-- Header con logo y título -->
         <div class="relative bg-gradient-to-br from-green-500/20 to-emerald-600/20 p-8 text-center border-b border-oscuro-600/50">
@@ -36,8 +36,8 @@
             <img src="/images/logo_undc_sistemas_blanco.webp" alt="Logo Sistemas UNDC" class="w-auto h-8" />
           </div>
 
-          <h1 class="text-3xl font-bold text-white mb-2">
-            Panel de <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Administración</span>
+          <h1 class="text-3xl font-bold text-white md:mb-2">
+            Panel de <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 glow-text">Administración</span>
           </h1>
           <p class="text-oscuro-300 text-sm hidden sm:block">
             Inicia sesión para gestionar el sistema
@@ -82,7 +82,7 @@
             leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 translate-y-1"
           >
-            <div v-if="auth.error" class="p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
+            <div v-if="auth.error" class="p-4 bg-red-500/10 border border-red-500/50 rounded-xl md:rounded-lg">
               <div class="flex items-center gap-3 text-red-400">
                 <i class="fa-solid fa-circle-exclamation"></i>
                 <p class="text-sm font-medium">{{ auth.error }}</p>
@@ -159,7 +159,7 @@ const handleMouseMove = (event) => {
 const handleLogin = async () => {
   const exito = await auth.iniciarSesion(form.value)
   if (exito) {
-    router.push('/admin')
+    router.push('/admin/dashboard')
   }
 }
 </script>

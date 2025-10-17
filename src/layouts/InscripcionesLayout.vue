@@ -23,7 +23,7 @@
           <BotonHexagonal
             size="sm"
             text="Ver reglas"
-            href="https://drive.google.com/file/d/1hzyQp93w21qKF57vo4arkGuENj-yQh0L/view"
+            href="https://drive.google.com/file/d/1_FDL7uk4XeAJy_lnKnE7xTob4q5HZH0K/view?usp=sharing"
           />
         </div>
       </div>
