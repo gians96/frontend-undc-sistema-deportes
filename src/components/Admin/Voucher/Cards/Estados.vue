@@ -1,46 +1,70 @@
 <template>
-  <div class="voucher-cards grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-8">
     <div
       v-for="card in cardConfig"
       :key="card.estado"
-      @click="$emit('filtrar', card.estado)"
+      @click="handleCardClick(card.estado)"
+      class="relative p-4 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group border-2"
       :class="[
-        'bg-oscuro-800 rounded-xl shadow-lg border-l-4 p-2 sm:p-4 cursor-pointer transition-all duration-300 transform',
-        card.borderColor,
-        filtroActivo === card.estado ?
-          `ring-2 ${card.ringColor} ${card.bgColor} ${card.shadowColor} active` :
-          `hover:shadow-xl ${card.hoverBorder} border-oscuro-600`
+        filtroActivo === card.estado
+          ? `${card.borderColor} ${card.bgColor} shadow-lg ${card.shadowColor}`
+          : 'bg-oscuro-850 backdrop-blur-lg border-oscuro-800/60 hover:bg-oscuro-800 hover:border-oscuro-600'
       ]"
     >
-      <div class="flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left">
-        <div class="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3">
-          <div :class="`hidden sm:block bg-gradient-to-br ${card.gradientFrom} ${card.gradientTo} p-2 rounded-lg shadow-lg`">
-            <i :class="`fa-solid ${card.icono} text-white text-lg`"></i>
-          </div>
-          <div>
-            <p class="text-xs sm:text-sm font-medium text-oscuro-200">{{ card.titulo }}</p>
-            <p :class="`text-lg sm:text-2xl font-bold ${card.textColor}`">{{ stats[card.estado] }}</p>
-          </div>
+      <div class="relative z-10 flex items-center gap-3 sm:gap-4">
+        <!-- Contenedor del Icono -->
+        <div 
+          class="flex-shrink-0 p-2 sm:p-3 rounded-lg sm:rounded-xl transition-colors duration-300"
+          :class="filtroActivo === card.estado ? card.activeIconBg : 'bg-oscuro-900/70'"
+        >
+          <component 
+            :is="card.icono" 
+            class="w-6 h-6 sm:w-7 sm:h-7 transition-colors duration-300"
+            :class="filtroActivo === card.estado ? card.iconoColor : card.textColor"
+          />
         </div>
-        <div v-if="filtroActivo === card.estado" class="hidden sm:block">
-          <i :class="`fas fa-check-circle ${card.textColor}`"></i>
+        
+        <!-- Contenido de Texto -->
+        <div class="flex-grow">
+          <p 
+            class="text-xs sm:text-sm font-semibold opacity-80"
+            :class="filtroActivo === card.estado ? card.textColor : 'text-oscuro-100'"
+          >
+            {{ card.titulo }}
+          </p>
+          <p 
+            class="text-2xl sm:text-4xl font-bold"
+            :class="filtroActivo === card.estado ? card.activeTextColor : card.textColor"
+          >
+            {{ stats[card.estado] }}
+          </p>
         </div>
       </div>
+      
+      <!-- Efecto de brillo para la tarjeta activa -->
+      <div 
+        v-if="filtroActivo === card.estado" 
+        class="absolute top-0 left-0 w-full h-full z-0 opacity-10"
+        :class="`${card.gradientFrom} via-transparent to-transparent`"
+        style="background-image: radial-gradient(circle at 20% 20%, var(--tw-gradient-stops));"
+      ></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
+import CirculoPendienteIcono from '@/components/icons/CirculoPendienteIcono.vue'
+import CirculoCheckIcono from '@/components/icons/CirculoCheckIcono.vue'
+import CiculoCancelarIcono from '@/components/icons/CiculoCancelarIcono.vue'
 
 const props = defineProps({
   estadisticas: {
     type: Object,
     default: () => ({
-      total: 0,
-      pendientes: 0,
-      validados: 0,
-      rechazados: 0
+      pendiente: 0,
+      validado: 0,
+      rechazado: 0
     })
   },
   filtroActivo: {
@@ -51,91 +75,56 @@ const props = defineProps({
 
 const emit = defineEmits(['filtrar'])
 
-// Configuración de los cards con clases completas para Tailwind
-const cardConfig = [
+const handleCardClick = (estado) => {
+  if (props.filtroActivo === estado) {
+    emit('filtrar', null)
+  } else {
+    emit('filtrar', estado)
+  }
+}
+
+// Configuración de tarjetas con un estilo inspirado en One UI
+const cardConfig = shallowRef([
   {
     estado: 'pendiente',
     titulo: 'Pendientes',
-    color: 'yellow',
-    icono: 'fa-clock',
-    borderColor: 'border-yellow-400',
+    icono: CirculoPendienteIcono,
     textColor: 'text-yellow-400',
-    ringColor: 'ring-yellow-400',
-    bgColor: 'bg-yellow-900/30',
-    shadowColor: 'shadow-yellow-400/20',
-    hoverBorder: 'hover:border-yellow-300',
-    gradientFrom: 'from-yellow-500',
-    gradientTo: 'to-yellow-600'
+    iconoColor: 'text-yellow-400',
+    borderColor: 'border-yellow-400',
+    bgColor: 'bg-yellow-500/10',
+    shadowColor: 'shadow-yellow-500/10',
+    gradientFrom: 'from-yellow-400',
+    activeIconBg: 'bg-yellow-400/20',
+    activeTextColor: 'text-yellow-300'
   },
   {
     estado: 'validado',
     titulo: 'Validados',
-    color: 'green',
-    icono: 'fa-check-circle',
-    borderColor: 'border-green-400',
+    icono: CirculoCheckIcono,
     textColor: 'text-green-400',
-    ringColor: 'ring-green-400',
-    bgColor: 'bg-green-900/30',
-    shadowColor: 'shadow-green-400/20',
-    hoverBorder: 'hover:border-green-300',
-    gradientFrom: 'from-green-500',
-    gradientTo: 'to-green-600'
+    iconoColor: 'text-green-400',
+    borderColor: 'border-green-400',
+    bgColor: 'bg-green-500/10',
+    shadowColor: 'shadow-green-500/10',
+    gradientFrom: 'from-green-400',
+    activeIconBg: 'bg-green-400/20',
+    activeTextColor: 'text-green-300'
   },
   {
     estado: 'rechazado',
     titulo: 'Rechazados',
-    color: 'red',
-    icono: 'fa-times-circle',
-    borderColor: 'border-red-400',
+    icono: CiculoCancelarIcono,
     textColor: 'text-red-400',
-    ringColor: 'ring-red-400',
-    bgColor: 'bg-red-900/30',
-    shadowColor: 'shadow-red-400/20',
-    hoverBorder: 'hover:border-red-300',
-    gradientFrom: 'from-red-500',
-    gradientTo: 'to-red-600'
+    iconoColor: 'text-red-400',
+    borderColor: 'border-red-400',
+    bgColor: 'bg-red-500/10',
+    shadowColor: 'shadow-red-500/10',
+    gradientFrom: 'from-red-400',
+    activeIconBg: 'bg-red-400/20',
+    activeTextColor: 'text-red-300'
   }
-]
+])
 
-// Usar las estadísticas que vienen del store
 const stats = computed(() => props.estadisticas)
-
-// Formatear montos
-const formatAmount = (amount) => {
-  return amount
-}
 </script>
-
-<style scoped>
-.voucher-cards {
-  min-height: fit-content;
-}
-
-/* Animaciones hover para desktop */
-@media (min-width: 640px) {
-  .voucher-cards > div {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-
-  .voucher-cards > div:hover:not(.active) {
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
-}
-
-/* Optimización para móviles */
-@media (max-width: 639px) {
-  .voucher-cards {
-    gap: 0.5rem;
-  }
-
-  .voucher-cards > div {
-    padding: 0.5rem;
-    min-height: auto;
-  }
-
-  /* Reducir aún más el espaciado en móviles */
-  .voucher-cards > div > div > div {
-    gap: 0.25rem;
-  }
-}
-</style>

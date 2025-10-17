@@ -39,11 +39,11 @@ const routes = [
   {
     path: "/admin",
     component: AdminLayout,
-    // 🚨 CAMBIO CLAVE: Usa metadatos para marcar la ruta como privada
+    // CAMBIO CLAVE: Usa metadatos para marcar la ruta como privada
     meta: { requiresAuth: true }, 
     children: [
       {
-        path: "",
+        path: "dashboard",
         name: "AdminDashboard",
         component: AdminIndex,
       },

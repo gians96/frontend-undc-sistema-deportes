@@ -25,7 +25,7 @@
         :value="modelValue"
         @input="actualizarValor($event.target.value)"
         :class="[
-          'w-full px-4 py-3 bg-oscuro-900/50 text-white placeholder-oscuro-400 rounded-lg border transition-all duration-200',
+          'w-full px-4 py-3 bg-oscuro-900/50 text-white placeholder-oscuro-400 rounded-full md:rounded-lg border transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'hover:border-oscuro-500',

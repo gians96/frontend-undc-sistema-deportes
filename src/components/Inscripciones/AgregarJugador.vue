@@ -2,7 +2,7 @@
   <div class="p-4 sm:p-6 rounded-md border border-gray-400/20 backdrop-blur-sm">
     <div class="flex items-center justify-between mb-4 sm:mb-6 pb-2 border-b border-gray-700">
       <h3 class="text-white text-xl sm:text-2xl lg:text-3xl font-semibold glow-text flex items-center gap-2 uppercase">
-        Jugadores ({{ jugadores.length }}/16)
+        Jugadores ({{ jugadores.length }}/{{ limite }})
       </h3>
       <!-- Botón solo visible en pantallas medianas y grandes -->
        <div class="hidden sm:block ">
@@ -10,7 +10,7 @@
            icon="fa-solid fa-circle-plus"
            text="Agregar jugador"
            @click="agregarJugador"
-           :disabled="jugadores.length >= 16"
+           :disabled="!puedeAgregarJugador || !hayDeporteSeleccionado"
            tipo="button"
          />
        </div>
@@ -227,7 +227,7 @@
         icon="fa-solid fa-circle-plus"
         text="Agregar jugador"
         @click="agregarJugador"
-        :disabled="jugadores.length >= 16"
+        :disabled="!puedeAgregarJugador || !hayDeporteSeleccionado"
         tipo="button"
         :className="'w-full items-center justify-center'"
       />
@@ -236,20 +236,45 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import BotonPrincipal from '../common/botton/BotonPrincipal.vue'
-import { useInscripcionesJugadores } from '../../composables/inscripciones-jugadores.js'
+import { useInscripcionesJugadores } from '@/composables/inscripciones-jugadores.js'
 
 const propiedades = defineProps({
   modelValue: {
     type: Array,
     default: () => []
+  },
+  limiteJugadores: {
+    type: Number,
+    default: 33
+  },
+  hayDeporteSeleccionado: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emitir = defineEmits(['update:modelValue'])
 
 const jugadores = computed(() => propiedades.modelValue)
+
+console.log('🔍 Tipo de limiteJugadores:', typeof propiedades.limiteJugadores);
+
+// Crear un computed para el límite que sea reactivo
+const limiteReactivo = computed(() => {
+  return propiedades.limiteJugadores;
+});
+
+// Watch para monitorear cambios en la prop
+watch(() => propiedades.limiteJugadores, (nuevoLimite, viejoLimite) => {
+  // Si el nuevo límite es menor y hay jugadores que exceden el límite, advertir
+  if (jugadores.value.length > nuevoLimite) {
+    console.warn(`⚠️ Hay ${jugadores.value.length} jugadores pero el límite es ${nuevoLimite}. Los jugadores excedentes no serán eliminados automáticamente.`);
+  }
+}, { immediate: true })
+
+console.log('🚀 Llamando a useInscripcionesJugadores con límite:', limiteReactivo.value);
 
 const {
   agregarJugador,
@@ -259,8 +284,16 @@ const {
   isJugadorComplete,
   todosJugadoresCompletos,
   cantidadJugadores,
-  puedeAgregarJugador
-} = useInscripcionesJugadores(jugadores, emitir)
+  puedeAgregarJugador,
+  limite
+} = useInscripcionesJugadores(jugadores, emitir, limiteReactivo)
+
+console.log('✅ Límite calculado por composable:', limite.value);
+
+// Watch para verificar cambios en puedeAgregarJugador
+watch(puedeAgregarJugador, (nuevoValor) => {
+  console.log('🎮 puedeAgregarJugador cambió a:', nuevoValor, 'Jugadores actuales:', jugadores.value.length, 'Límite:', limite.value);
+}, { immediate: true })
 </script>
 
 <style scoped>

@@ -1,18 +1,27 @@
 <template>
   <div>
     <!-- Contenido principal del formulario (solo visible si tiene acceso) -->
-    <div v-if="accesoAutorizado" class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+      v-if="accesoAutorizado"
+      class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+    >
       <div class="overflow-hidden">
         <form @submit.prevent="handleSubmit" class="py-4 sm:py-6 lg:py-8">
           <!-- Layout flexible de 2 columnas -->
           <div class="flex flex-col xl:flex-row gap-4 sm:gap-6 lg:gap-8">
             <!-- Columna Izquierda: Información del Grupo -->
-            <div class="flex-1 xl:min-w-2xl space-y-4 sm:space-y-6 lg:space-y-8">
+            <div
+              class="flex-1 xl:min-w-2xl space-y-4 sm:space-y-6 lg:space-y-8"
+            >
               <!-- Información del Grupo -->
               <RegistrarGrupo v-model="grupoData" />
 
               <!-- Registro de Jugadores -->
-              <AgregarJugador v-model="jugadores" />
+              <AgregarJugador
+                v-model="jugadores"
+                :limiteJugadores="limiteJugadores"
+                :hayDeporteSeleccionado="hayDeporteSeleccionado"
+              />
             </div>
 
             <!-- Columna Derecha: Información de Pago -->
@@ -35,7 +44,10 @@
     </div>
 
     <!-- Mensaje de carga mientras se verifica el acceso -->
-    <div v-else-if="!mostrarModalRegistro" class="flex items-center justify-center min-h-screen">
+    <div
+      v-else-if="!mostrarModalRegistro"
+      class="flex items-center justify-center min-h-screen"
+    >
       <div class="text-center">
         <i class="fas fa-spinner fa-spin text-4xl text-green-400 mb-4"></i>
         <p class="text-gray-300 text-lg">Verificando acceso...</p>
@@ -114,15 +126,20 @@ import RegistrarPago from "../components/Inscripciones/RegistrarPago.vue";
 import Modal from "../components/Inscripciones/Modal.vue";
 import ModalConfirmacion from "../components/Inscripciones/ModalConfirmacion.vue";
 import ModalRegistro from "../components/Inscripciones/ModalRegistro.vue";
-import { useOpcionesPago, useAutorizarIngreso, useInscripcionesApi } from "../stores/inscripciones.js";
+import {
+  useOpcionesPago,
+  useAutorizarIngreso,
+  useInscripcionesApi,
+} from "../stores/inscripciones.js";
 import { useOpcionesDeporte } from "../stores/deporte.js";
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
+import { useInscripcionesEquipo } from "../composables/inscripciones-equipo.js";
 
 defineOptions({
   layout: InscripcionesLayout,
 });
 
-const router = useRouter()
+const router = useRouter();
 
 // Stores
 const storePago = useOpcionesPago();
@@ -136,13 +153,17 @@ const accesoAutorizado = ref(false);
 
 // Computed properties para obtener nombres legibles
 const nombreDeporte = computed(() => {
-  const deporte = storeDeporte.deportes.find(d => d.valor === parseInt(grupoData.value.deporte));
-  return deporte ? deporte.etiqueta : '';
+  const deporte = storeDeporte.deportes.find(
+    (d) => d.valor === parseInt(grupoData.value.deporte)
+  );
+  return deporte ? deporte.etiqueta : "";
 });
 
 const montoActual = computed(() => {
-  const opcionPago = storePago.pago.find(p => p.valor === grupoData.value.tipoPago);
-  return opcionPago ? opcionPago.monto : '30.00';
+  const opcionPago = storePago.pago.find(
+    (p) => p.valor === grupoData.value.tipoPago
+  );
+  return opcionPago ? opcionPago.monto : "30.00";
 });
 
 const grupoData = ref({
@@ -153,6 +174,14 @@ const grupoData = ref({
   deporte: "",
   tipoPago: "regular",
   seccion: "",
+});
+
+// Computed para obtener el límite de jugadores basado en el deporte seleccionado
+const { limiteJugadores } = useInscripcionesEquipo(grupoData, () => {});
+
+// Computed para saber si hay un deporte seleccionado
+const hayDeporteSeleccionado = computed(() => {
+  return grupoData.value.deporte !== "" && grupoData.value.deporte !== null;
 });
 
 const form = ref({
@@ -173,7 +202,7 @@ const formularioCompleto = computed(() => {
       grupoData.value?.nombreGrupo &&
       grupoData.value?.deporte &&
       grupoData.value?.tipoPago &&
-      (grupoData.value?.tipoPago === 'adicional' || grupoData.value?.seccion);
+      (grupoData.value?.tipoPago === "adicional" || grupoData.value?.seccion);
 
     // Validar que haya al menos un jugador
     const hayJugadores = jugadores.value?.length > 0;
@@ -239,7 +268,6 @@ const datosGuardados = ref({
   cantidadJugadores: 0,
 });
 
-
 // Funciones del modal
 const mostrarModal = (configuracion) => {
   modalTipo.value = configuracion.tipo || "confirmacion";
@@ -256,7 +284,6 @@ const cerrarModal = () => {
   modalMostrar.value = false;
 };
 
-
 const mostrarModalCamposIncompletos = () => {
   const camposFaltantes = [];
 
@@ -267,7 +294,7 @@ const mostrarModalCamposIncompletos = () => {
   if (!grupoData.value.nombreGrupo) camposFaltantes.push("Nombre del Grupo");
   if (!grupoData.value.deporte) camposFaltantes.push("Deporte");
   if (!grupoData.value.tipoPago) camposFaltantes.push("Tipo de Inscripción");
-  if (grupoData.value.tipoPago !== 'adicional' && !grupoData.value.seccion) {
+  if (grupoData.value.tipoPago !== "adicional" && !grupoData.value.seccion) {
     camposFaltantes.push("Sección");
   }
 
@@ -337,8 +364,6 @@ const manejarConfirmacion = () => {
   }
 };
 
-
-
 const handleSubmit = async () => {
   // Validación del lado cliente - mostrar modal de advertencia si hay campos faltantes
   if (!validarFormularioCompleto()) {
@@ -361,14 +386,19 @@ const confirmarEnvio = async () => {
 
   try {
     // Procesar jugadores: unir nombre y apellido, convertir sexo
-    const jugadoresProcesados = jugadores.value.map(jugador => ({
+    const jugadoresProcesados = jugadores.value.map((jugador) => ({
       ...jugador,
       nombre: `${jugador.nombre} ${jugador.apellido}`.trim(),
-      sexo: jugador.sexo === 'masculino' ? 'M' : jugador.sexo === 'femenino' ? 'F' : jugador.sexo
+      sexo:
+        jugador.sexo === "masculino"
+          ? "M"
+          : jugador.sexo === "femenino"
+          ? "F"
+          : jugador.sexo,
     }));
 
     // Eliminar campo apellido de los jugadores procesados
-    jugadoresProcesados.forEach(jugador => {
+    jugadoresProcesados.forEach((jugador) => {
       delete jugador.apellido;
     });
 
@@ -384,7 +414,7 @@ const confirmarEnvio = async () => {
       jugadores: jugadoresProcesados,
       cantidadParticipantes: jugadores.value.length,
       numeroOperacion: form.value.numeroOperacion,
-      titularCuenta: form.value.titularCuenta
+      titularCuenta: form.value.titularCuenta,
     };
 
     console.log("Datos del formulario (original):", {
@@ -397,7 +427,10 @@ const confirmarEnvio = async () => {
     console.log("Datos que se enviarán a la API:", datosAPI);
 
     // Realizar llamada a la API usando el store
-    const resultado = await storeInscripciones.crearInscripcion(datosAPI, comprobante.value);
+    const resultado = await storeInscripciones.crearInscripcion(
+      datosAPI,
+      comprobante.value
+    );
     console.log("Respuesta de la API:", resultado);
 
     // Guardar datos antes de limpiar para mostrar en el modal de éxito
@@ -411,8 +444,8 @@ const confirmarEnvio = async () => {
     // Limpiar formulario después del éxito
     Object.keys(grupoData.value).forEach((key) => {
       // Mantener el valor por defecto para tipoPago, limpiar otros campos
-      if (key === 'tipoPago') {
-        grupoData.value[key] = 'regular';
+      if (key === "tipoPago") {
+        grupoData.value[key] = "regular";
       } else {
         grupoData.value[key] = "";
       }
@@ -429,11 +462,12 @@ const confirmarEnvio = async () => {
     console.error("Error al enviar el formulario:", error);
 
     // Usar el mensaje del backend si está disponible, sino usar un mensaje genérico
-    let mensajeError = "Ocurrió un error al procesar su inscripción. Por favor, verifique su conexión a internet e intente nuevamente.";
+    let mensajeError =
+      "Ocurrió un error al procesar su inscripción. Por favor, verifique su conexión a internet e intente nuevamente.";
 
     if (error.response?.data?.mensaje) {
       mensajeError = error.response.data.mensaje;
-    } else if (error.message && !error.message.includes('Network Error')) {
+    } else if (error.message && !error.message.includes("Network Error")) {
       mensajeError = error.message;
     }
 
@@ -468,7 +502,7 @@ const cerrarModalRegistro = () => {
   mostrarModalRegistro.value = false;
   // Redirigir al home si no tiene acceso
   if (!accesoAutorizado.value) {
-    router.push('/');
+    router.push("/");
   }
 };
 

@@ -3,10 +3,10 @@
     :type="tipo"
     :disabled="disabled"
     :class="[
-      'group relative w-full px-6 py-3.5 overflow-hidden rounded-lg font-semibold text-base transition-all duration-300',
+      'group relative w-full px-6 py-4 md:py-3.5 overflow-hidden rounded-full md:rounded-lg font-semibold text-base transition-all duration-300',
       disabled
         ? 'bg-oscuro-600 text-oscuro-400 cursor-not-allowed'
-        : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 hover:shadow-lg hover:shadow-green-500/50 active:scale-95'
+        : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 active:scale-95 cursor-pointer transition-colors'
     ]"
     @click="handleClick"
   >
