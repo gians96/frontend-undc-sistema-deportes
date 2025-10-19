@@ -73,7 +73,7 @@
     <ModalConfirmacion
       :mostrar="modalConfirmacionMostrar"
       titulo="¡Inscripción Exitosa!"
-      :mensaje="`Su inscripción ha sido procesada correctamente.<br><br>
+      :mensaje="`Su inscripción ha sido procesada correctamente.<br>
                 <strong>Equipo:</strong> ${datosGuardados.nombreGrupo}<br>
                 <strong>Deporte:</strong> ${datosGuardados.deporte}<br>
                 <strong>Jugadores:</strong> ${datosGuardados.cantidadJugadores}<br>`"
