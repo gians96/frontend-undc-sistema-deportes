@@ -6,11 +6,11 @@
       @click="cerrarPorFondo"
     >
       <!-- Overlay mejorado -->
-      <div class="absolute inset-0 bg-gradient-to-br from-black/40 to-gray-900/95 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-black/70 to-gray-900/95 backdrop-blur-md"></div>
 
       <!-- Modal mejorado -->
       <div
-        class="relative bg-gradient-to-br from-[#0f1419] to-[#1a2332] rounded-2xl shadow-2xl border border-green-400/30 max-w-lg w-full transform transition-all duration-500 overflow-hidden"
+        class="relative bg-gradient-to-br from-[#0f1419] to-[#1a2332] rounded-2xl shadow-2xl border border-green-400/20 max-w-lg w-full transform transition-all duration-500 overflow-hidden"
         :class="animacionClase"
         @click.stop
       >
@@ -42,8 +42,28 @@
 
           <!-- Mensaje mejorado -->
           <div class="bg-gray-800/30 rounded-xl p-6 mb-8 border border-gray-700/50 backdrop-blur-sm">
-            <p class="text-gray-200 font-medium leading-relaxed text-lg" v-html="mensaje"></p>
+            <p class="text-gray-200 font-medium leading-relaxed text-sm" v-html="mensaje"></p>
           </div>
+
+          <!-- Card para unirse a WhatsApp (Flexbox Compacto) -->
+          <a
+            :href="whatsApp.link"
+            target="_blank"
+            key="whatsapp-link-flex"
+            class="group relative block w-full p-3 mb-4 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 hover:border-green-500/40 rounded-lg transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <i class="fa-brands fa-whatsapp text-2xl text-green-400 transition-transform duration-300 group-hover:scale-110"></i>
+                <div class="text-left">
+                  <p class="font-semibold text-white text-sm">Únete al grupo de WhatsApp</p>
+                  <p class="text-gray-400 text-xs">{{ whatsApp.nombreGrupo }}</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-green-400/50 transition-transform duration-300 group-hover:translate-x-1"></i>
+            </div>
+            <div class="absolute top-0 left-0 h-full w-full bg-green-400/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+          </a>
 
           <!-- Botón mejorado -->
           <button
@@ -97,6 +117,13 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['confirmar', 'cerrar'])
+
+const whatsApp = {
+  link: 'https://chat.whatsapp.com/H57QlIJMB1h6aXncegp4eV?mode=wwc',
+  nombreGrupo: 'Coordinación Deportiva'
+}
+
+
 
 const animacionClase = ref('scale-95 opacity-0')
 
