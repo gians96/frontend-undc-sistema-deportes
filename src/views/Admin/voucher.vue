@@ -23,6 +23,9 @@
       @filtrar="filtrarPorEstado"
     />
 
+    <!-- Filtros adicionales -->
+    <FiltrosAdicionales @update:filtros="filtrarPorCicloSeccion" class="mb-6" />
+
     <!-- Cards de vouchers -->
     <div v-if="loading" class="text-center py-8">
       <i class="fas fa-spinner fa-spin text-2xl text-green-400"></i>
@@ -80,11 +83,11 @@
 </template>
 
 <script setup>
-import AdminLayout from "@/layouts/AdminLayout.vue";
 import CardEstados from "@/components/Admin/Voucher/Cards/Estados.vue";
 import VoucherCard from "@/components/Admin/Voucher/Cards/Voucher.vue";
 import ModalImagen from "@/components/Admin/Voucher/ModalImagen.vue";
 import SheetImagen from "@/components/Admin/Voucher/SheetImagen.vue";
+import FiltrosAdicionales from "@/components/common/FiltrosAdicionales.vue";
 import { useAdminVouchers } from "@/composables/admin-vouchers";
 
 // Usar el composable que maneja toda la lógica
@@ -102,6 +105,7 @@ const {
 
   // Funciones principales
   filtrarPorEstado,
+  filtrarPorCicloSeccion,
   validarVoucher,
   verImagen,
   cerrarModal,

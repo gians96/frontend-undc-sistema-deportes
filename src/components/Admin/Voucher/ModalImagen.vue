@@ -131,7 +131,7 @@
 
             <!-- Detalles con Scroll -->
             <div
-              class="flex-grow p-5 space-y-6 overflow-y-auto custom-scrollbar"
+              class="flex-grow p-5 space-y-6 overflow-hidden"
             >
               <!-- Detalles Adicionales -->
               <div class="px-3">
@@ -202,16 +202,17 @@
                             voucherActualizado.jugadores &&
                             voucherActualizado.jugadores.length
                           "
-                          class="text-sm border-t border-oscuro-600 pt-3 space-y-1"
+                          class="custom-scrollbar text-sm border-t border-oscuro-600 pt-3 space-y-1 max-h-48 overflow-y-auto"
                         >
                           <li
-                            v-for="jugador in voucherActualizado.jugadores"
+                            v-for="(jugador, index) in voucherActualizado.jugadores"
                             :key="jugador.id"
-                            class="flex justify-between items-center py-1.5 px-2"
+                            class="flex justify-between items-center py-1.5 px-1 rounded-md hover:bg-white/5"
                           >
-                            <span class="text-oscuro-50 font-semibold">{{
-                              jugador.nombre
-                            }}</span>
+                            <span class="text-oscuro-50 font-semibold text-xs flex items-center">
+                              <span class="text-oscuro-400 mr-2 text-left">{{ index + 1 }}.</span>
+                              {{ jugador.nombre }}
+                            </span>
                             <span class="font-mono front-medium text-xs truncate text-oscuro-200">{{
                               jugador.codigo_estudiante
                             }}</span>
@@ -413,20 +414,6 @@ const formatearFecha = (fecha) => {
 </script>
 
 <style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-}
-
 .aurora-bg::before {
   content: "";
   position: absolute;
@@ -453,5 +440,25 @@ const formatearFecha = (fecha) => {
   to {
     transform: translate(-50%, -50%) rotate(360deg);
   }
+}
+
+/* Scrollbar personalizado */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #2c3745b0 #37415100;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #16a34a;
 }
 </style>

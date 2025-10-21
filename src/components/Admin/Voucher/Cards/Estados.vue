@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-8">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
     <div
       v-for="card in cardConfig"
       :key="card.estado"
