@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-oscuro-50:  #e5e7e9;
+  --color-oscuro-50: #e5e7e9;
   --color-oscuro-100: #cfd3d6;
   --color-oscuro-200: #a3aab0;
   --color-oscuro-300: #77808a;
@@ -13,10 +13,11 @@
   --color-oscuro-850: #0c1115;
   --color-oscuro-900: #080c0f;
   --color-oscuro-950: #040608;
+  --color-verde-primario: #45f882;
 }
 
 * {
-    font-family: 'Rajdhani', sans-serif;
+  font-family: 'Rajdhani', sans-serif;
 }
 
 .glow-text {
@@ -29,4 +30,105 @@
 
 .pendiente-text {
   text-shadow: 0 0 10px rgba(197, 192, 34, 0.5);
+}
+
+/* Scrollbar personalizado para todo el layout admin - estilos globales */
+.admin-layout * {
+  scrollbar-width: thin;
+  scrollbar-color: #374151 #1f2937;
+}
+
+.admin-layout *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-layout *::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+.admin-layout *::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+  border: 2px solid #1f2937;
+}
+
+.admin-layout *::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+
+.admin-layout *::-webkit-scrollbar-corner {
+  background: #000000;
+}
+
+/* Scrollbar del body y html */
+body:has(.admin-layout),
+html:has(.admin-layout) {
+  scrollbar-width: thin;
+  scrollbar-color: #37415165 #000000;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar,
+html:has(.admin-layout)::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-track,
+html:has(.admin-layout)::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-thumb,
+html:has(.admin-layout)::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+  border: 2px solid #1f2937;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-thumb:hover,
+html:has(.admin-layout)::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+body:has(.admin-layout)::-webkit-scrollbar-corner,
+html:has(.admin-layout)::-webkit-scrollbar-corner {
+  background: #1f2937;
+}
+
+/* Scrollbar personalizado para el layout por defecto */
+body,
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-primario) var(--color-oscuro-800);
+}
+
+body::-webkit-scrollbar,
+html::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track {
+  background: #040608;
+}
+
+body::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb {
+  background: var(--color-verde-primario);
+  border-radius: 8px;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--color-green-50);
+}
+
+::selection {
+  background: var(--color-verde-primario);
+  color: var(--color-oscuro-800);
+  text-shadow: none;
 }
