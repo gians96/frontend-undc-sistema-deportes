@@ -1,4 +1,4 @@
-// src/stores/inscripciones.js
+// src/stores/deporte.js
 import { defineStore } from "pinia";
 
 export const useOpcionesDeporte = defineStore("opciones", {

@@ -17,8 +17,12 @@ export function useAdminVouchers() {
   const estadisticas = computed(() => vouchersStore.estadisticas)
 
   // Funciones de filtrado
-  const filtrarPorEstado = async (estado) => {
-    await vouchersStore.filtrarPorEstado(estado)
+  const filtrarPorEstado = (estado) => {
+    vouchersStore.aplicarFiltros({ estado })
+  }
+
+  const filtrarPorCicloSeccion = (filtros) => {
+    vouchersStore.aplicarFiltros(filtros)
   }
 
   // Funciones del modal
@@ -35,8 +39,8 @@ export function useAdminVouchers() {
   // Funciones de validacion
   const validarVoucher = async (idVoucher, estado) => {
     try {
+      // La lógica de re-filtrado ahora está en la acción del store
       await vouchersStore.validarVoucher(idVoucher, estado)
-      await vouchersStore.cargarVouchers(vouchersStore.filtroActivo)
       cerrarModal()
     } catch (error) {
       console.error('Error al actualizar voucher:', error)
@@ -103,6 +107,7 @@ export function useAdminVouchers() {
 
     // Funciones principales
     filtrarPorEstado,
+    filtrarPorCicloSeccion, // Exportar nueva función
     validarVoucher,
     verImagen,
     cerrarModal,
