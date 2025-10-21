@@ -1,23 +1,34 @@
 import { defineStore } from "pinia";
 import api from '../services/api';
 
+const toRoman = (num) => {
+  const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+  let result = '';
+  for (let key in map) {
+    while (num >= map[key]) {
+      result += key;
+      num -= map[key];
+    }
+  }
+  return result;
+};
+
 export const useEquiposApi = defineStore("equiposApi", {
   state: () => ({
     equipos: [],
-    todosLosEquipos: [], // Almacena todos los equipos cargados una sola vez
+    todosLosEquipos: [],
     loading: false,
     error: null,
     deporteSeleccionado: null,
+    cicloSeleccionado: null,
+    seccionSeleccionada: null,
 
-    // Equipos para el torneo (desde partidos.vue)
     equiposParaTorneo: [],
-
-    // Estructura del torneo (gestionado desde partidos.vue)
     torneo: {
       rondas: [],
       equiposIniciales: [],
       campeón: null,
-      estado: 'no_iniciado' // no_iniciado, en_progreso, finalizado
+      estado: 'no_iniciado'
     }
   }),
 
@@ -25,15 +36,12 @@ export const useEquiposApi = defineStore("equiposApi", {
     equiposActivos: (state) => state.equipos.filter(e => e.estado_inscripcion === 'activo'),
     equiposPendientes: (state) => state.equipos.filter(e => e.estado_inscripcion === 'pendiente'),
     equiposValidados: (state) => state.equipos.filter(e => e.estado_inscripcion === 'validado'),
-
     estadisticas: (state) => ({
       total: state.equipos.length,
       activos: state.equipos.filter(e => e.estado_inscripcion === 'activo').length,
       pendientes: state.equipos.filter(e => e.estado_inscripcion === 'pendiente').length,
       validados: state.equipos.filter(e => e.estado_inscripcion === 'validado').length
     }),
-
-    // Equipos elegibles para torneo (usado por partidos.vue)
     equiposParaSorteo: (state) => state.equipos.filter(e =>
       e.estado_inscripcion === 'validado' || e.estado_inscripcion === 'activo'
     )
@@ -41,31 +49,18 @@ export const useEquiposApi = defineStore("equiposApi", {
 
   actions: {
     async cargarTodosLosEquipos() {
-      // Solo cargar si no hay equipos cargados previamente
-      if (this.todosLosEquipos.length > 0) {
-        return;
-      }
-
+      if (this.todosLosEquipos.length > 0) return;
       this.loading = true;
       this.error = null;
-
       try {
         const response = await api.get('/api/admin/equipos');
-
-        // La API devuelve un objeto con claves por deporte, convertirlo a array
         const data = response.data;
-
-        if (Array.isArray(data)) {
-          // Si ya es un array, usarlo directamente
-          this.todosLosEquipos = data;
-        } else if (typeof data === 'object' && data !== null) {
-          // Si es un objeto, aplanar todos los arrays
+        if (typeof data === 'object' && data !== null) {
           this.todosLosEquipos = Object.values(data).flat();
         } else {
           console.error('❌ Formato de datos inesperado:', data);
           this.todosLosEquipos = [];
         }
-
       } catch (error) {
         this.error = error;
         console.error('❌ Error al cargar equipos:', error);
@@ -81,10 +76,20 @@ export const useEquiposApi = defineStore("equiposApi", {
         return;
       }
 
-      // Filtrado local, sin llamar al API
-      this.equipos = this.todosLosEquipos.filter(
-        equipo => equipo.deporte_id === deporte.valor
+      let equiposFiltrados = this.todosLosEquipos.filter(
+        item => item.deporte_id === deporte.valor
       );
+
+      if (this.cicloSeleccionado) {
+        const cicloRomano = toRoman(this.cicloSeleccionado);
+        equiposFiltrados = equiposFiltrados.filter(item => item.ciclo === cicloRomano);
+      }
+
+      if (this.seccionSeleccionada) {
+        equiposFiltrados = equiposFiltrados.filter(item => item.seccion === this.seccionSeleccionada);
+      }
+
+      this.equipos = equiposFiltrados;
     },
 
     seleccionarDeporte(deporte) {
@@ -92,31 +97,28 @@ export const useEquiposApi = defineStore("equiposApi", {
       this.filtrarPorDeporte(deporte);
     },
 
+    setFiltros(filtros) {
+      this.cicloSeleccionado = filtros.ciclo;
+      this.seccionSeleccionada = filtros.seccion;
+      this.filtrarPorDeporte(this.deporteSeleccionado);
+    },
+
     reiniciarTorneo() {
-      this.torneo = {
-        rondas: [],
-        equiposIniciales: [],
-        campeón: null,
-        estado: 'no_iniciado'
-      };
+      this.torneo = { rondas: [], equiposIniciales: [], campeón: null, estado: 'no_iniciado' };
     },
 
     clearError() {
       this.error = null;
     },
 
-    // Método auxiliar para actualizar resultado de partido (usado por partidos.vue)
     actualizarResultadoPartido(rondaIndex, partidoId, resultado, ganadorId) {
       const ronda = this.torneo.rondas[rondaIndex];
       const partido = ronda.partidos.find(p => p.detalle_partido_id === partidoId);
-
       if (partido) {
         partido.resultado = resultado;
         partido.ganador = ganadorId === partido.equipo1?.id_equipo ? partido.equipo1 : partido.equipo2;
         partido.estado = 'finalizado';
         partido.estado_id = 2;
-
-        // Si es la final, establecer el campeón
         if (ronda.nombre === 'Final' && partido.ganador) {
           this.torneo.campeón = partido.ganador;
           this.torneo.estado = 'finalizado';

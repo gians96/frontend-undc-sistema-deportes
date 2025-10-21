@@ -28,6 +28,9 @@
           >
             <component :is="item.icon" />
             <span>{{ item.label }}</span>
+            <span v-if="item.badgeCount > 0" class="ml-auto bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {{ item.badgeCount }}
+            </span>
           </RouterLink>
         </li>
       </ul>

@@ -18,7 +18,7 @@
       :key="getEquipoId(equipo)"
       class="relative md:bg-oscuro-850 bg-oscuro-800 backdrop-blur-md border border-oscuro-700 rounded-3xl overflow-hidden transition-all duration-300 hover:border-green-700/30 hover:shadow-2xl hover:shadow-green-900/20"
     >
-      <div class="relative p-5 flex flex-col">
+      <div class="relative p-5 flex flex-col h-full">
         <!-- Cabecera -->
         <div class="flex-shrink-0 ">
           <div class="flex items-start gap-3">
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Cuerpo Principal: Participantes y Ciclo-Sección -->
-        <div class="flex items-center justify-between my-6">
+        <div class="flex items-center justify-between my-6 flex-grow">
           <!-- Participantes o Jugador -->
           <div class="text-center flex-1">
             <div v-if="equipo.participantes">
@@ -88,59 +88,36 @@
         <!-- Botón Ver Jugadores (solo para equipos) -->
         <button
           v-if="!esJugadorIndividual(equipo)"
-          @click.stop="toggleJugadores(equipo)"
-          class="w-full bg-oscuro-900/50 hover:bg-green-500/10 border border-oscuro-700 hover:border-green-500/50 rounded-2xl px-4 py-3 text-sm font-semibold text-oscuro-300 hover:text-green-400 transition-all duration-200 flex items-center justify-between"
+          @click="abrirModalJugadores(equipo)"
+          class="w-full mt-auto bg-oscuro-900/50 hover:bg-green-500/10 border border-oscuro-700 hover:border-green-500/50 rounded-2xl px-4 py-3 text-sm font-semibold text-oscuro-300 hover:text-green-400 transition-all duration-200 flex items-center justify-between"
         >
           <span class="flex items-center gap-2">
             <i class="fas fa-users"></i>
             Ver Jugadores
           </span>
-          <i
-            class="fas fa-chevron-down transition-transform duration-200"
-            :class="{ 'rotate-180': equipo.expandido }"
-          ></i>
+          <i class="fas fa-chevron-right"></i>
         </button>
-
-        <!-- Acordeón de Jugadores -->
-        <div
-          v-if="!esJugadorIndividual(equipo) && equipo.expandido"
-          class="mt-3 bg-oscuro-900/30 rounded-xl border border-oscuro-700 overflow-hidden animate-in slide-in-from-top-2 duration-300"
-        >
-          <div v-if="equipo.cargandoJugadores" class="p-4 text-center">
-            <i class="fas fa-spinner fa-spin text-green-400"></i>
-            <p class="text-xs text-oscuro-300 mt-2">Cargando jugadores...</p>
-          </div>
-
-          <div v-else-if="equipo.jugadores && equipo.jugadores.length > 0" class="divide-y divide-oscuro-700">
-            <div
-              v-for="(jugador, index) in equipo.jugadores"
-              :key="index"
-              class="p-3 flex items-center justify-between hover:bg-oscuro-800/50 transition-colors"
-            >
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center border border-green-500/30">
-                  <span class="text-xs font-bold text-green-400">{{ index + 1 }}</span>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-white">{{ jugador.nombre }}</p>
-                  <p class="text-xs text-oscuro-400">Código: {{ jugador.codigo_estudiante }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="p-4 text-center">
-            <p class="text-xs text-oscuro-400">No hay jugadores registrados</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
+
+  <!-- Modal o Sheet de Jugadores (Renderizado Condicional) -->
+  <component
+    v-if="modalActivo"
+    :is="isMobile ? SheetJugadores : JugadoresModal"
+    :equipo="equipoSeleccionado"
+    :jugadores="jugadoresDelEquipo"
+    :cargando="cargandoJugadores"
+    @close="cerrarModalJugadores"
+  />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import api from '@/services/api'
+import JugadoresModal from './JugadoresModal.vue'
+import SheetJugadores from './SheetJugadores.vue' // Importar el nuevo sheet
+import { useScreenSize } from '@/composables/useScreenSize' // Importar el composable
 
 defineProps({
   equipos: {
@@ -153,57 +130,57 @@ defineProps({
   }
 })
 
-// Detectar si es equipo o jugador individual
-const esJugadorIndividual = (item) => {
-  return item.jugador_id !== undefined
+const { isMobile } = useScreenSize() // Usar el composable para obtener el tamaño de pantalla
+
+// Marcar componentes como shallow para optimización, ya que son dinámicos
+const JugadoresModal_ = shallowRef(JugadoresModal)
+const SheetJugadores_ = shallowRef(SheetJugadores)
+
+// --- Estados para el Modal/Sheet (la lógica se mantiene) ---
+const modalActivo = ref(false)
+const equipoSeleccionado = ref(null)
+const jugadoresDelEquipo = ref([])
+const cargandoJugadores = ref(false)
+
+// --- Lógica del Modal/Sheet (la lógica se mantiene) ---
+const abrirModalJugadores = async (equipo) => {
+  equipoSeleccionado.value = equipo
+  modalActivo.value = true
+  
+  if (!equipo.jugadores) {
+    cargandoJugadores.value = true
+    try {
+      const response = await api.get(`/api/admin/equipos/jugadores/${equipo.equipo_id}`)
+      equipo.jugadores = response.data
+      jugadoresDelEquipo.value = response.data
+    } catch (error) {
+      console.error('❌ Error al cargar jugadores:', error)
+      jugadoresDelEquipo.value = []
+    } finally {
+      cargandoJugadores.value = false
+    }
+  } else {
+    jugadoresDelEquipo.value = equipo.jugadores
+  }
 }
 
-// Obtener ID del equipo o jugador
-const getEquipoId = (item) => {
-  return item.equipo_id || item.jugador_id
+const cerrarModalJugadores = () => {
+  modalActivo.value = false
+  equipoSeleccionado.value = null
+  jugadoresDelEquipo.value = []
 }
 
-// Obtener nombre del equipo o jugador
-const getNombre = (item) => {
-  return item.equipo_nombre || item.jugador_nombre
-}
-
-// Obtener icono según tipo
-const getTipoIcono = (item) => {
-  return esJugadorIndividual(item) ? 'fas fa-user' : 'fas fa-users'
-}
-
-// Obtener texto del tipo
-const getTipoTexto = (item) => {
-  return esJugadorIndividual(item) ? 'Jugador Individual' : 'Equipo'
-}
-
+// --- Funciones de ayuda (se mantienen igual) ---
+const esJugadorIndividual = (item) => item.jugador_id !== undefined
+const getEquipoId = (item) => item.equipo_id || item.jugador_id
+const getNombre = (item) => item.equipo_nombre || item.jugador_nombre
+const getTipoIcono = (item) => esJugadorIndividual(item) ? 'fas fa-user' : 'fas fa-users'
+const getTipoTexto = (item) => esJugadorIndividual(item) ? 'Jugador Individual' : 'Equipo'
 const formatearFecha = (fecha) => {
   return new Date(fecha).toLocaleDateString('es-PE', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   })
-}
-
-// Función para toggle del acordeón de jugadores
-const toggleJugadores = async (equipo) => {
-  // Toggle expandido
-  equipo.expandido = !equipo.expandido
-
-  // Si se está expandiendo y no tiene jugadores cargados, cargarlos
-  if (equipo.expandido && !equipo.jugadores) {
-    equipo.cargandoJugadores = true
-
-    try {
-      const response = await api.get(`/api/admin/equipos/jugadores/${equipo.equipo_id}`)
-      equipo.jugadores = response.data
-    } catch (error) {
-      console.error('❌ Error al cargar jugadores:', error)
-      equipo.jugadores = []
-    } finally {
-      equipo.cargandoJugadores = false
-    }
-  }
 }
 </script>

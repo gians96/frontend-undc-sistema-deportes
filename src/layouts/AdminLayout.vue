@@ -2,7 +2,7 @@
   <div class="admin-layout bg-black">
     <!-- Sidebar para Desktop -->
     <Sidebar 
-      :menu-items="menuItems"
+      :menu-items="navMenuItems"
       @go-to-home="goToHome"
       @cerrar-sesion="handleCerrarSesion"
     />
@@ -21,12 +21,12 @@
 
     <!-- Navegación Móvil -->
     <BottomBar 
-      :bottomNavItems="menuItems" 
+      :bottomNavItems="navMenuItems"
       @open-sheet="isSheetOpen = true"
     />
     <SheetNavegacion 
       v-model="isSheetOpen" 
-      :menuItems="menuItems"
+      :menuItems="navMenuItems"
       :configMenuItem="configMenuItem"
       @menu-action="handleMenuAction"
     />
@@ -34,11 +34,12 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, computed } from 'vue';
+import { ref, shallowRef, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useVouchersApi } from '@/stores/vouchers';
 
-// Importar componentes de layout y de íconos
+// Importar componentes
 import Sidebar from '@/components/Admin/Layout/Sidebar.vue';
 import Navbar from '@/components/Admin/Layout/Navbar.vue';
 import BottomBar from '@/components/Admin/Layout/BottomBar.vue';
@@ -53,16 +54,35 @@ import InicioIcono from '@/components/icons/InicioIcono.vue';
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const vouchersStore = useVouchersApi();
 
 const isSheetOpen = ref(false);
 
-// Definir items del menú
-const menuItems = shallowRef([
+// Cargar el contador de pendientes al montar el layout
+onMounted(() => {
+  vouchersStore.fetchPendingCount();
+});
+
+// Definir items base del menú
+const baseMenuItems = shallowRef([
   { path: '/admin/dashboard', label: 'Dashboard', icon: InicioIcono },
   { path: '/admin/voucher', label: 'Vouchers', icon: VoucherIcono },
   { path: '/admin/equipos', label: 'Equipos', icon: EquiposIcono },
   { path: '/admin/partidos', label: 'Partidos', icon: PartidosIcono },
 ]);
+
+// Crear una lista reactiva de items de menú que incluya el contador
+const navMenuItems = computed(() => {
+  return baseMenuItems.value.map(item => {
+    if (item.path === '/admin/voucher') {
+      return {
+        ...item,
+        badgeCount: vouchersStore.pendingCount
+      };
+    }
+    return item;
+  });
+});
 
 const configMenuItem = shallowRef({
   label: 'Cerrar Sesión',
@@ -72,7 +92,7 @@ const configMenuItem = shallowRef({
 
 const pageTitle = computed(() => {
   const currentPath = route.path;
-  const menuItem = menuItems.value.find(item => currentPath.startsWith(item.path));
+  const menuItem = navMenuItems.value.find(item => currentPath.startsWith(item.path));
   return menuItem ? menuItem.label : 'Admin';
 });
 
@@ -105,73 +125,5 @@ const handleMenuAction = (action) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-</style>
-
-<style>
-/* Scrollbar personalizado para todo el layout admin - estilos globales */
-.admin-layout * {
-  scrollbar-width: thin;
-  scrollbar-color: #374151 #1f2937;
-}
-
-.admin-layout *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.admin-layout *::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 10px;
-}
-
-.admin-layout *::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 10px;
-  border: 2px solid #1f2937;
-}
-
-.admin-layout *::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-.admin-layout *::-webkit-scrollbar-corner {
-  background: #000000;
-}
-
-/* Scrollbar del body y html */
-body:has(.admin-layout),
-html:has(.admin-layout) {
-  scrollbar-width: thin;
-  scrollbar-color: #37415165 #000000;
-}
-
-body:has(.admin-layout)::-webkit-scrollbar,
-html:has(.admin-layout)::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-body:has(.admin-layout)::-webkit-scrollbar-track,
-html:has(.admin-layout)::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 10px;
-}
-
-body:has(.admin-layout)::-webkit-scrollbar-thumb,
-html:has(.admin-layout)::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 10px;
-  border: 2px solid #1f2937;
-}
-
-body:has(.admin-layout)::-webkit-scrollbar-thumb:hover,
-html:has(.admin-layout)::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-body:has(.admin-layout)::-webkit-scrollbar-corner,
-html:has(.admin-layout)::-webkit-scrollbar-corner {
-  background: #1f2937;
 }
 </style>

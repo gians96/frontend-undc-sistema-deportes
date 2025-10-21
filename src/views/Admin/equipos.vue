@@ -23,7 +23,11 @@
       :todos-los-equipos="equiposStore.todosLosEquipos"
       :cantidad-equipos="equiposStore.equipos.length"
       @seleccionar-deporte="seleccionarDeporte"
+      class="mb-4"
     />
+
+    <!-- Filtros adicionales -->
+    <FiltrosAdicionales @update:filtros="actualizarFiltros" class="mb-4" />
 
     <!-- Vista de equipos (solo visualización) -->
     <Vistas
@@ -36,10 +40,10 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import AdminLayout from '../../layouts/AdminLayout.vue'
 import { useOpcionesDeporte } from '../../stores/deporte'
 import { useEquiposApi } from '../../stores/equipos'
 import DeporteSelector from '../../components/Admin/Equipos/DeporteSelector.vue'
+import FiltrosAdicionales from '../../components/common/FiltrosAdicionales.vue'
 import Vistas from '../../components/Admin/Equipos/Vistas.vue'
 
 const opcionesStore = useOpcionesDeporte()
@@ -48,6 +52,10 @@ const equiposStore = useEquiposApi()
 
 const seleccionarDeporte = (deporte) => {
   equiposStore.seleccionarDeporte(deporte)
+}
+
+const actualizarFiltros = (filtros) => {
+  equiposStore.setFiltros(filtros)
 }
 
 onMounted(async () => {

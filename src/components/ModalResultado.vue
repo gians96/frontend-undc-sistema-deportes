@@ -18,9 +18,9 @@
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-oscuro-500 rounded-full flex items-center justify-center">
-                <span class="text-sm font-bold text-white">{{ partido.equipo1?.ciclo }}</span>
+                <span class="text-sm font-bold text-white">{{ partido.equipo_1?.ciclo }}</span>
               </div>
-              <span class="font-medium text-white">{{ partido.equipo1?.nombre_equipo }}</span>
+              <span class="font-medium text-white">{{ partido.equipo_1?.nombre }}</span>
             </div>
           </div>
           <input
@@ -42,9 +42,9 @@
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-oscuro-500 rounded-full flex items-center justify-center">
-                <span class="text-sm font-bold text-white">{{ partido.equipo2?.ciclo }}</span>
+                <span class="text-sm font-bold text-white">{{ partido.equipo_2?.ciclo }}</span>
               </div>
-              <span class="font-medium text-white">{{ partido.equipo2?.nombre_equipo }}</span>
+              <span class="font-medium text-white">{{ partido.equipo_2?.nombre }}</span>
             </div>
           </div>
           <input
@@ -62,7 +62,7 @@
         <div class="flex items-center gap-2 text-green-200">
           <i class="fas fa-crown text-green-400"></i>
           <span class="font-medium">
-            {{ ganadorActual === 'empate' ? 'Empate' : `Ganador: ${ganadorActual.nombre_equipo}` }}
+            {{ ganadorActual === 'empate' ? 'Empate' : `Ganador: ${ganadorActual.nombre}` }}
           </span>
         </div>
       </div>
@@ -91,33 +91,20 @@
 import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false
-  },
-  partido: {
-    type: Object,
-    default: () => ({})
-  },
-  esEdicion: {
-    type: Boolean,
-    default: false
-  }
+  visible: { type: Boolean, default: false },
+  partido: { type: Object, default: () => ({}) },
+  esEdicion: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(['cerrar', 'confirmar']);
 
-const puntajes = ref({
-  equipo1: 0,
-  equipo2: 0
-});
+const puntajes = ref({ equipo1: 0, equipo2: 0 });
 
-// Calcular ganador automáticamente
 const ganadorActual = computed(() => {
   if (puntajes.value.equipo1 > puntajes.value.equipo2) {
-    return props.partido.equipo1;
+    return props.partido.equipo_1;
   } else if (puntajes.value.equipo2 > puntajes.value.equipo1) {
-    return props.partido.equipo2;
+    return props.partido.equipo_2;
   } else if (puntajes.value.equipo1 === puntajes.value.equipo2 && puntajes.value.equipo1 > 0) {
     return 'empate';
   }
@@ -129,12 +116,11 @@ const puntajesValidos = computed(() => {
          (puntajes.value.equipo1 !== 0 || puntajes.value.equipo2 !== 0);
 });
 
-// Cargar puntajes existentes cuando es edición
 watch(() => props.visible, (visible) => {
   if (visible && props.esEdicion && props.partido.resultado) {
     puntajes.value = {
-      equipo1: props.partido.resultado.equipo1 || 0,
-      equipo2: props.partido.resultado.equipo2 || 0
+      equipo1: props.partido.resultado.puntos_equipo_1 || 0,
+      equipo2: props.partido.resultado.puntos_equipo_2 || 0
     };
   } else if (visible && !props.esEdicion) {
     puntajes.value = { equipo1: 0, equipo2: 0 };
@@ -147,10 +133,10 @@ const cerrarModal = () => {
 
 const confirmarResultado = () => {
   const ganadorId = ganadorActual.value === 'empate' ? null :
-                   ganadorActual.value?.id_equipo || null;
+                   ganadorActual.value?.id || null;
 
-  const perdedorId = ganadorId === props.partido.equipo1?.id_equipo ? props.partido.equipo2?.id_equipo :
-                    ganadorId === props.partido.equipo2?.id_equipo ? props.partido.equipo1?.id_equipo : null;
+  const perdedorId = ganadorId === props.partido.equipo_1?.id ? props.partido.equipo_2?.id :
+                    ganadorId === props.partido.equipo_2?.id ? props.partido.equipo_1?.id : null;
 
   emit('confirmar', {
     puntos_equipo_1: puntajes.value.equipo1,
@@ -159,7 +145,6 @@ const confirmarResultado = () => {
     perdedor_id: perdedorId
   });
 
-  // Resetear después de confirmar
   puntajes.value = { equipo1: 0, equipo2: 0 };
 };
 </script>
