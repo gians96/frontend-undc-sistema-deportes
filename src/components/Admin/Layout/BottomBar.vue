@@ -8,7 +8,12 @@
         class="flex flex-col items-center justify-center flex-1 py-2 transition-colors duration-300 ease-in-out"
         :class="{ 'text-green-400': $route.path.startsWith(item.path) }"
       >
-        <component :is="item.icon" class="w-6 h-6 mb-1" />
+        <div class="relative">
+          <component :is="item.icon" class="w-6 h-6 mb-1" />
+          <span v-if="item.badgeCount > 0" class="absolute top-0 right-0 w-4 h-4 bg-verde-primario text-white text-xs rounded-full flex items-center justify-center text-[10px] font-bold">
+            {{ item.badgeCount }}
+          </span>
+        </div>
         <span 
           class="font-medium text-xs"
           :class="{ 'glow-text': $route.path.startsWith(item.path) }"
