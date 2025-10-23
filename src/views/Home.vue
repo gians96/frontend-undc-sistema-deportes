@@ -35,37 +35,12 @@
 
       <!-- Tabla de posiciones -->
       <TablaPosiciones
-        v-else-if="datos && datos.posiciones.length > 0"
+        v-else-if="datos"
         :nombre-deporte="datos.nombre_deporte"
         :torneo="datos.torneo"
         :fecha-actualizacion="datos.fecha_actualizacion"
         :posiciones="datos.posiciones"
       />
-
-      <!-- Estado vacío -->
-      <div
-        v-else
-        class="bg-oscuro-800 rounded-2xl shadow-2xl border border-oscuro-600 p-12"
-      >
-        <div class="text-center">
-          <div
-            class="inline-flex items-center justify-center w-20 h-20 mb-6 bg-oscuro-700 rounded-2xl"
-          >
-            <i class="fa-solid fa-table text-oscuro-400 text-3xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold text-white mb-3">
-            No hay posiciones disponibles
-          </h3>
-          <p class="text-oscuro-300 max-w-md mx-auto mb-6">
-            Actualmente no hay torneos activos para
-            {{ datos?.nombre_deporte || "este deporte" }}. Las posiciones se
-            actualizarán cuando comiencen los partidos.
-          </p>
-          <div class="flex justify-center">
-            <BotonHexagonal text="Inscribirse" href="/inscripciones" />
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Inscribirse -->
