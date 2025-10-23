@@ -1,51 +1,87 @@
-// API simulada para obtener tabla de posiciones
-export const obtenerPosiciones = async (deporteId = 1) => {
-  // Simulación de delay de red
-  await new Promise(resolve => setTimeout(resolve, 500));
+import api from "@/services/api";
 
-  // Datos simulados basados en simulacion-api.json
-  const datosSimulados = {
-    1: { // Fútsal
-      id_deporte: 1,
-      nombre_deporte: "Fútsal",
-      torneo: "Torneo Interuniversitario 2025",
-      fecha_actualizacion: new Date().toISOString(),
-      posiciones: []
-    },
-    3: { // Vóley
-      id_deporte: 3,
-      nombre_deporte: "Vóley",
-      torneo: "Copa Universitaria de Vóley 2025",
-      fecha_actualizacion: new Date().toISOString(),
-      posiciones: []
-    },
-    4: { // Ajedrez
-      id_deporte: 4,
-      nombre_deporte: "Ajedrez",
-      torneo: "Torneo de Ajedrez Universitario 2025",
-      fecha_actualizacion: new Date().toISOString(),
-      posiciones: []
-    },
-    5: { // Gincana
-      id_deporte: 5,
-      nombre_deporte: "Gincana",
-      torneo: "Gincana Universitaria 2025",
-      fecha_actualizacion: new Date().toISOString(),
-      posiciones: []
-    }
-  };
+let posicionesCache = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000;
 
-  // Si no hay datos para el deporte solicitado, devolver estructura vacía
-  if (!datosSimulados[deporteId]) {
-    return {
-      id_deporte: deporteId,
-      nombre_deporte: "Deporte",
-      torneo: "Sin torneo activo",
-      fecha_actualizacion: new Date().toISOString(),
-      posiciones: []
-    };
-  }
-
-  return datosSimulados[deporteId];
+const sportMap = {
+  1: "futsal",
+  2: "basquet",
+  3: "voley",
+  // Ajedrez (4) no está en la nueva API, se manejará el caso de dato no encontrado
+  5: "gincana",
 };
 
+// Mapeo de IDs de deporte a sus nombres para mantener la estructura anterior
+const sportNameMap = {
+  1: "Fútsal",
+  2: "Básquet",
+  3: "Vóley",
+  4: "Ajedrez",
+  5: "Gincana",
+};
+
+async function fetchPosiciones() {
+  const now = Date.now();
+  if (posicionesCache && now - lastFetchTime < CACHE_DURATION) {
+    return posicionesCache;
+  }
+
+  try {
+    const response = await api.get("/api/posiciones");
+    posicionesCache = response.data;
+    lastFetchTime = now;
+    return posicionesCache;
+  } catch (error) {
+    console.error(
+      "Error al obtener la tabla de posiciones desde la API:",
+      error
+    );
+    posicionesCache = null;
+    lastFetchTime = 0;
+    throw error;
+  }
+}
+
+export const obtenerPosiciones = async (deporteId = 1) => {
+  try {
+    const allPosiciones = await fetchPosiciones();
+
+    const sportKey = sportMap[deporteId];
+
+    if (!sportKey || !allPosiciones || !allPosiciones[sportKey]) {
+      return {
+        id_deporte: deporteId,
+        nombre_deporte: sportNameMap[deporteId] || "Deporte Desconocido",
+        torneo: "Sin torneo activo",
+        fecha_actualizacion: new Date().toISOString(),
+        posiciones: [],
+      };
+    }
+
+    // Se obtienen las posiciones para el deporte solicitado
+    const posicionesFromApi = allPosiciones[sportKey];
+
+    const posiciones = posicionesFromApi.map((equipo) => ({
+      ...equipo,
+      pe: equipo.pj - equipo.pg - equipo.pp,
+    }));
+
+    return {
+      id_deporte: deporteId,
+      nombre_deporte: sportNameMap[deporteId],
+      torneo: "Semana Sistémica 2025", 
+      fecha_actualizacion: new Date().toISOString(),
+      posiciones: posiciones,
+    };
+  } catch (error) {
+    const message = error.response?.data?.mensaje || "Error al cargar torneo";
+    return {
+      id_deporte: deporteId,
+      nombre_deporte: sportNameMap[deporteId] || "Deporte",
+      torneo: message,
+      fecha_actualizacion: new Date().toISOString(),
+      posiciones: [],
+    };
+  }
+};
