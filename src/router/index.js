@@ -11,6 +11,7 @@ import AdminPartidos from "@/views/Admin/partidos.vue";
 import NoEncontrado from "@/views/error/NoEncontrado.vue";
 import NoAutorizado from "@/views/error/NoAutorizado.vue";
 import Login from "@/views/Login.vue";
+import Formulario from "@/views/Formulario.vue";
 import { useAuthStore } from '@/stores/auth' 
 
 const routes = [
@@ -33,6 +34,17 @@ const routes = [
         path: "",
         name: "Inscripciones",
         component: Inscripciones,
+      },
+    ],
+  },
+  {
+    path: "/formulario",
+    component: DefaultLayout,
+    children: [
+      {
+        path: "",
+        name: "Formulario",
+        component: Formulario,
       },
     ],
   },
