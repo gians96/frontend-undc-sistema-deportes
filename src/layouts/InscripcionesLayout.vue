@@ -1,7 +1,7 @@
 <template>
   <div class="inscripciones-layout">
-    <nav class="navbar-fixed bg-[#0f161b]/90 backdrop-blur-sm">
-      <div class="navbar-container max-w-6xl">
+    <nav class="navbar-fixed bg-oscuro-800/90 backdrop-blur-sm">
+      <div class="navbar-container max-w-7xl">
         <div class="nav-brand flex items-center gap-2 sm:gap-3">
           <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 transition-transform duration-200 group-hover:scale-105">
             <img

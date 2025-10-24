@@ -70,7 +70,13 @@ export const useInscripcionesApi = defineStore("inscripcionesApi", {
   state: () => ({
     loading: false,
     error: null,
-    lastSubmission: null
+    lastSubmission: null,
+    estadoInscripcion: {
+      abierto: false,
+      estado: false,
+      mensaje: "Verificando estado de las inscripciones...",
+      cargando: true,
+    }
   }),
 
   actions: {
@@ -106,6 +112,26 @@ export const useInscripcionesApi = defineStore("inscripcionesApi", {
         throw error;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async verificarEstadoInscripciones() {
+      this.estadoInscripcion.cargando = true;
+      this.error = null;
+      try {
+        const { data } = await api.get('/api/inscripciones');
+        this.estadoInscripcion.abierto = data.abierto;
+        this.estadoInscripcion.estado = data.estado;
+        this.estadoInscripcion.mensaje = data.mensaje;
+        return data;
+      } catch (error) {
+        this.error = error;
+        this.estadoInscripcion.mensaje = "Error al verificar el estado de las inscripciones.";
+        this.estadoInscripcion.abierto = false;
+        this.estadoInscripcion.estado = false;
+        throw error;
+      } finally {
+        this.estadoInscripcion.cargando = false;
       }
     },
 
