@@ -146,7 +146,7 @@
                   <td class="px-4 py-5">
                     <div class="relative">
                       <span class="font-bold text-white group-hover:text-verde-primario transition-colors duration-300">
-                        {{ equipo.equipo }}
+                        {{ equipo.equipo || equipo.jugador }}
                       </span>
                       <!-- Fuego solo para el primero - Posicionamiento absoluto para no afectar layout -->
                       <i

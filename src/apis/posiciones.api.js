@@ -8,7 +8,7 @@ const sportMap = {
   1: "futsal",
   2: "basquet",
   3: "voley",
-  // Ajedrez (4) no está en la nueva API, se manejará el caso de dato no encontrado
+  4: "ajedrez",
   5: "gincana",
 };
 
@@ -62,15 +62,15 @@ export const obtenerPosiciones = async (deporteId = 1) => {
     // Se obtienen las posiciones para el deporte solicitado
     const posicionesFromApi = allPosiciones[sportKey];
 
-    const posiciones = posicionesFromApi.map((equipo) => ({
-      ...equipo,
-      pe: equipo.pj - equipo.pg - equipo.pp,
+    const posiciones = posicionesFromApi.map((item) => ({
+      ...item,
+      pe: item.pj - item.pg - item.pp,
     }));
 
     return {
       id_deporte: deporteId,
       nombre_deporte: sportNameMap[deporteId],
-      torneo: "Semana Sistémica 2025", 
+      torneo: "Semana Sistémica 2025",
       fecha_actualizacion: new Date().toISOString(),
       posiciones: posiciones,
     };

@@ -19,7 +19,7 @@ export const useOpcionesDeporte = defineStore("opciones", {
       { valor: 1, etiqueta: 'Fútsal', icono: 'fas fa-futbol', maxJugadores: 10 },
       { valor: 2, etiqueta: 'Básquet', icono: 'fa-solid fa-basketball', tipo: 'basket', maxJugadores: 10 },
       { valor: 3, etiqueta: 'Vóley', icono: 'fa-solid fa-volleyball', maxJugadores: 10 },
-      { valor: 4, etiqueta: 'Ajedrez', icono: 'fa-solid fa-chess', maxJugadores: 4 },
+      { valor: 4, etiqueta: 'Ajedrez', icono: 'fa-solid fa-chess', maxJugadores: 4, individual: true },
       { valor: 5, etiqueta: 'Gincana', icono: 'fas fa-puzzle-piece', maxJugadores: 33 }
     ],
     fasesTorneo: [

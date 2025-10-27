@@ -1,6 +1,6 @@
-import { ref, computed, onMounted } from 'vue';
-import { usePartidosApi } from '@/stores/partidos.js';
-import { useOpcionesDeporte } from '@/stores/deporte.js';
+import { ref, computed, onMounted } from "vue";
+import { usePartidosApi } from "@/stores/partidos.js";
+import { useOpcionesDeporte } from "@/stores/deporte.js";
 
 export const useAdminPartidos = () => {
   // Stores
@@ -16,6 +16,9 @@ export const useAdminPartidos = () => {
   const torneo = computed(() => partidosStore.torneo);
   const equiposParaTorneo = computed(() => partidosStore.equiposParaTorneo);
   const cargando = computed(() => partidosStore.cargando);
+  const esDeporteIndividual = computed(
+    () => deporteSeleccionado.value?.individual || false
+  );
 
   // --- MÉTODOS PRINCIPALES ---
 
@@ -25,44 +28,71 @@ export const useAdminPartidos = () => {
       await partidosStore.cargarDatosDeporte(deporte.valor);
       guardarSeleccionDeporte(deporte);
     } catch (error) {
-      alert('Error al cargar datos del torneo: ' + (error.response?.data?.mensaje || error.message));
+      alert(
+        "Error al cargar datos del torneo: " +
+          (error.response?.data?.mensaje || error.message)
+      );
     }
   };
 
   const generarTorneo = async () => {
     try {
-      const equiposParaAPI = partidosStore.equiposParaTorneo.map(e => ({
+      const participantes = partidosStore.equiposParaTorneo.map((e) => ({
         id: e.id_equipo || e.jugador_id,
-        nombre: e.nombre_equipo || e.jugador_nombre
+        nombre: e.nombre_equipo || e.jugador_nombre,
       }));
 
-      if (equiposParaAPI.length < 4) {
-        alert('Se necesitan al menos 4 equipos/jugadores para generar un torneo.');
+      if (participantes.length < 4) {
+        alert(
+          "Se necesitan al menos 4 equipos/jugadores para generar un torneo."
+        );
         return;
       }
 
-      await partidosStore.generarTorneo(deporteSeleccionado.value.valor, equiposParaAPI);
-      alert('¡Torneo generado exitosamente!');
+      await partidosStore.generarTorneo(
+        deporteSeleccionado.value.valor,
+        participantes,
+        esDeporteIndividual.value
+      );
+      alert("¡Torneo generado exitosamente!");
     } catch (error) {
-      alert('Error al generar torneo: ' + (error.response?.data?.mensaje || error.message));
+      alert(
+        "Error al generar torneo: " +
+          (error.response?.data?.mensaje || error.message)
+      );
     }
   };
 
   const reiniciarTorneo = async () => {
-    if (!confirm('¿Estás seguro de que quieres reiniciar el torneo? Se perderán todos los datos.')) return;
+    if (
+      !confirm(
+        "¿Estás seguro de que quieres reiniciar el torneo? Se perderán todos los datos."
+      )
+    )
+      return;
     try {
-      await partidosStore.reiniciarTorneo(deporteSeleccionado.value.valor);
-      alert('Torneo reiniciado exitosamente');
+      await partidosStore.reiniciarTorneo(
+        deporteSeleccionado.value.valor,
+        esDeporteIndividual.value
+      );
+      alert("Torneo reiniciado exitosamente");
     } catch (error) {
-      alert('Error al reiniciar torneo: ' + (error.response?.data?.mensaje || error.message));
+      alert(
+        "Error al reiniciar torneo: " +
+          (error.response?.data?.mensaje || error.message)
+      );
     }
   };
 
   const completarFase = async (rondaIndex) => {
-    if (!confirm('¿Crear enfrentamientos para la siguiente fase?')) return;
+    if (!confirm("¿Crear enfrentamientos para la siguiente fase?")) return;
     try {
       const ronda = partidosStore.torneo.rondas[rondaIndex];
-      const resultado = await partidosStore.avanzarRonda(deporteSeleccionado.value.valor, ronda.fase_id);
+      const resultado = await partidosStore.avanzarRonda(
+        deporteSeleccionado.value.valor,
+        ronda.fase_id,
+        esDeporteIndividual.value
+      );
 
       if (resultado.torneo_finalizado) {
         alert(`🏆 ¡Torneo finalizado!\n\nCampeón: ${resultado.campeon.nombre}`);
@@ -70,7 +100,10 @@ export const useAdminPartidos = () => {
         alert(`Ronda avanzada exitosamente.`);
       }
     } catch (error) {
-      alert('Error al avanzar ronda: ' + (error.response?.data?.mensaje || error.message));
+      alert(
+        "Error al avanzar ronda: " +
+          (error.response?.data?.mensaje || error.message)
+      );
     }
   };
 
@@ -80,7 +113,7 @@ export const useAdminPartidos = () => {
     const ronda = partidosStore.torneo.rondas[rondaIndex];
     if (!ronda) return;
 
-    const partido = ronda.partidos.find(p => p.enfrentamiento_id === partidoId);
+    const partido = ronda.partidos.find((p) => p.enfrentamiento_id === partidoId);
     if (!partido) return;
 
     // Añadir fase_id al objeto partido para que esté disponible en el modal
@@ -94,16 +127,20 @@ export const useAdminPartidos = () => {
     try {
       await partidosStore.finalizarPartido(
         partido.enfrentamiento_id,
-        partido.fase_id, 
+        partido.fase_id,
         datosResultado.puntos_equipo_1,
         datosResultado.puntos_equipo_2,
         datosResultado.ganador_id,
-        datosResultado.perdedor_id
+        datosResultado.perdedor_id,
+        esDeporteIndividual.value
       );
       cerrarModal();
-      alert('¡Resultado guardado exitosamente!');
+      alert("¡Resultado guardado exitosamente!");
     } catch (error) {
-      alert('Error al guardar resultado: ' + (error.response?.data?.mensaje || error.message));
+      alert(
+        "Error al guardar resultado: " +
+          (error.response?.data?.mensaje || error.message)
+      );
     }
   };
 
@@ -114,13 +151,15 @@ export const useAdminPartidos = () => {
   // --- HELPERS & LIFECYCLE ---
 
   const guardarSeleccionDeporte = (deporte) => {
-    localStorage.setItem('ultimoDeporteSeleccionado', deporte.valor.toString());
+    localStorage.setItem("ultimoDeporteSeleccionado", deporte.valor.toString());
   };
 
   const cargarUltimoDeporte = async () => {
-    const ultimoDeporteId = localStorage.getItem('ultimoDeporteSeleccionado');
+    const ultimoDeporteId = localStorage.getItem("ultimoDeporteSeleccionado");
     if (ultimoDeporteId && deportes.value.length) {
-      const deporte = deportes.value.find(d => d.valor.toString() === ultimoDeporteId);
+      const deporte = deportes.value.find(
+        (d) => d.valor.toString() === ultimoDeporteId
+      );
       if (deporte) {
         await seleccionarDeporte(deporte);
       }
@@ -130,7 +169,7 @@ export const useAdminPartidos = () => {
   onMounted(() => {
     // Esperar a que los deportes estén disponibles desde el store de opciones
     if (deportes.value.length) {
-        cargarUltimoDeporte();
+      cargarUltimoDeporte();
     }
   });
 
@@ -147,6 +186,6 @@ export const useAdminPartidos = () => {
     finalizarPartido,
     guardarResultado,
     completarFase,
-    cerrarModal
+    cerrarModal,
   };
 };
